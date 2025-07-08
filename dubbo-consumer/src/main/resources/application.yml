@@ -1,0 +1,51 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: dubbo-consumer
+
+dubbo:
+  application:
+    name: dubbo-consumer
+    qos-enable: false
+    #port: 22222
+  registry:
+    address: nacos://127.0.0.1:8848
+    username: nacos
+    password: nacos
+    group: ${ENV_GROUP:PROD_GROUP}   # 注册中心分组；全局的配置，必须与提供者一致，默认从此分组发现服务
+    parameters:
+      namespace: public
+  reference: #服务引用分组
+    group: GLOBAL_SERVICE_${ENV_GROUP:PROD_GROUP}  # 全局配置
+    version: "1.0.0"
+
+    "org.example.api.def.DemoService":  # 局部配置：此服务单独使用指定分组，不支持通配符
+      group: DEF_SERVICE_${ENV_GROUP:PROD_GROUP}
+    "org.example.api.def.OrderService":
+      group: DEF_SERVICE_${ENV_GROUP:PROD_GROUP}
+    "org.example.api.first.FirstService":
+      group: FIRST_SERVICE_${ENV_GROUP:PROD_GROUP}
+    "org.example.api.second.SecondService":
+      group: SECOND_SERVICE_${ENV_GROUP:PROD_GROUP}
+  config-center:
+    address: nacos://127.0.0.1:8848
+    username: nacos
+    password: nacos
+#    namespace: your-namespace-id  # 可选，默认为public对应的namespace
+#    group: ${ENV_GROUP:PROD_GROUP}            # 可选，默认DEFAULT_GROUP
+    check: false                  # 启动时不检查配置是否存在
+  metadata-report:
+    address: nacos://127.0.0.1:8848
+    username: nacos
+    password: nacos
+  consumer:
+    check: false
+    cluster: failover
+    retries: 2
+
+logging:
+  level:
+    org.apache.dubbo: INFO
+    com.alibaba.nacos: INFO
